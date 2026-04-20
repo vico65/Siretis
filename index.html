@@ -1,14 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Rekonsiliasi</title>
-	<link href="./src/output.css" rel="stylesheet">
-</head>
-<body class="m-2">
-	<h1 class="font-black font-popins text-2xl mb-10">Selamat Datang</h1>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Rekonsiliasi</title>
+		<link href="./src/output.css" rel="stylesheet" />
+	</head>
+	<body class="m-2" id="">
+		<h1 class="font-black font-popins text-2xl mb-10">Selamat Datang</h1>
+		<p id="penampil" class="mx-3 my-2 font-bold text-xl">Masih Kosong</p>
 
-	<a href="lampiran.html" class="text-white font-semibold py-2 px-3 bg-green-700 rounded-full hover:bg-green-600">Lampiran Ba</a>
-</body>
+		<div class="flex flex-2 flex-wrap">
+			<a
+				href="lampiran.html"
+				class="text-white font-semibold py-2 px-3 bg-green-700 rounded-full hover:bg-green-600 mr-3"
+				>Lampiran Ba</a
+			>
+			<input
+				type="text"
+				class="border-1 border-black rounded-2xl mr-2 px-2"
+			/>
+			<button
+				id="button_change_word"
+				type="button"
+				class="text-white font-semibold py-2 px-3 bg-amber-400 rounded-full hover:bg-amber-600"
+			>
+				Tampilkan
+			</button>
+			<p class="element-to-print" id="element-to-print"></p>
+		</div>
+	</body>
+	<script src="node_modules\html2canvas-pro\dist\html2canvas-pro.min.js"></script>
+	<script src="node_modules\html2pdf.js\dist\html2pdf.bundle.min.js"></script>
+	<script>
+		var element = document.getElementById("element-to-print");
+		var buttonChangeWord = document.getElementById("button_change_word");
+		var penampil = document.getElementById("penampil");
+
+		buttonChangeWord.addEventListener("click", function () {
+			var inputText = document.querySelector('input[type="text"]').value;
+			var teks = inputText.replaceAll("a/n : ", ""); //lah dihilangkan a/n
+			var arrayTeks = teks.split(" "); //dipecah jadi array per kata
+
+			var nama = [];
+			var noka = [];
+
+			arrayTeks.forEach(function (kata, index) {
+				if (index % 2 == 0) {
+					nama.push(capitalizeFirstLetter(kata));
+				} else {
+					noka.push(kata);
+				}
+			});
+
+			console.log(nama);
+
+			// = capitalizeFirstLetter(inputText.split("a/n : ")[1].trim());
+			// var noka = inputText.split("a/n : ")[0].trim();
+
+			// penampil.textContent = `${nama} (${noka})`;
+		});
+
+		function capitalizeFirstLetter(val) {
+			return (
+				String(val).charAt(0).toUpperCase() +
+				String(val).slice(1).toLowerCase()
+			);
+		}
+
+		// var worker = html2pdf().from(element).save();
+	</script>
 </html>

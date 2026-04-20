@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Rekonsiliasi</title>
+		<style></style>
 		<link href="./src/output.css" rel="stylesheet" />
 	</head>
-	<body class="m-2">
+	<body class="m-2 element">
 		<h1 class="font-black font-popins text-2xl mb-10">Lampiran BA</h1>
 
 		<!-- bulan dan tahun awal -->
@@ -15,32 +16,32 @@
 			<div class="">
 				<label for="my-selection">Bulan:</label>
 				<select id="bulan_awal_select" name="myOption">
-					<option value="" disabled selected>Pilih Bulan</option>
+					<option value="1" disabled selected>Pilih Bulan</option>
 				</select>
 			</div>
 
 			<div class="">
 				<label for="my-selection">Tahun:</label>
 				<select id="tahun_awal_select" name="myOption">
-					<option value="" disabled selected>Pilih Tahun</option>
+					<option value="2025" disabled selected>Pilih Tahun</option>
 				</select>
 			</div>
 		</div>
 
-        <!-- bulan dan tahun akhir -->
-        <div class="border-2 rounded-xl border-black p-2">
+		<!-- bulan dan tahun akhir -->
+		<div class="border-2 rounded-xl border-black p-2">
 			<p class="font-semibold">Bulan Akhir</p>
 			<div class="">
 				<label for="my-selection">Bulan:</label>
 				<select id="bulan_akhir_select" name="myOption">
-					<option value="" disabled selected>Pilih Bulan</option>
+					<option value="6" selected>Maret</option>
 				</select>
 			</div>
 
 			<div class="">
 				<label for="my-selection">Tahun:</label>
 				<select id="tahun_akhir_select" name="myOption">
-					<option value="" disabled selected>Pilih Tahun</option>
+					<option value="2025" selected>2026</option>
 				</select>
 			</div>
 		</div>
@@ -48,7 +49,7 @@
 		<div class="mt-2">
 			<button
 				id="konfirmasi_button"
-				class="text-white font-semibold py-2 px-3 bg-green-700 rounded-full hover:bg-green-600 cursor-pointer"
+				class="text-white font-semibold py-2 px-3 rounded-full bg-green-700 hover:bg-green-600 cursor-pointer"
 			>
 				Konfirmasi
 			</button>
@@ -56,84 +57,17 @@
 
 		<h2>Rentang : <span class="rentang_dipilih"></span></h2>
 
-		<div class="mt-10">
+		<!-- <div class="mt-10">
 			<a
 				href="index.html"
-				class="text-white font-semibold py-2 px-3 bg-green-700 rounded-full hover:bg-green-600"
+				class="text-white font-semibold py-2 px-3 rounded-full bg-green-700 hover:bg-green-600"
 				>Home</a
 			>
-		</div>
+		</div> -->
+
+		
 	</body>
 </html>
 
-<script>
-	var bulan = [
-		"Januari",
-		"Februari",
-		"Maret",
-		"April",
-		"Mei",
-		"Juni",
-		"Juli",
-		"Agustus",
-		"September",
-		"Oktober",
-		"November",
-		"Desember",
-	];
-	var tahun = [
-		"2014",
-		"2015",
-		"2016",
-		"2017",
-		"2018",
-		"2019",
-		"2020",
-		"2021",
-		"2022",
-		"2023",
-		"2024",
-		"2025",
-		"2026",
-	];
-	var bulanAwalSelect = document.getElementById("bulan_awal_select");
-	var bulanAkhirSelect = document.getElementById("bulan_akhir_select");
-	var rentangDipilihSpan = document.querySelector(".rentang_dipilih");
-	var tahunAwalSelect = document.getElementById("tahun_awal_select");
-	var tahunAkhirSelect = document.getElementById("tahun_akhir_select");
-	console.log(tahunAwalSelect);
-
-	tahun.forEach(function (tahunNama) {
-		var option = document.createElement("option");
-		option.value = tahunNama; // Nilai tahun
-		option.text = tahunNama; // Nama tahun
-		tahunAwalSelect.appendChild(option);
-        tahunAkhirSelect.appendChild(option.cloneNode(true));
-	});
-
-	bulan.forEach(function (bulanNama, index) {
-		var option = document.createElement("option");
-		option.value = index + 1; // Nilai bulan (1-12)
-		option.text = bulanNama; // Nama bulan
-		bulanAwalSelect.appendChild(option);
-        bulanAkhirSelect.appendChild(option.cloneNode(true));
-	});
-
-	var konfirmasiButton = document.getElementById("konfirmasi_button");
-	konfirmasiButton.addEventListener("click", function () {
-		var selectedBulanAwalIndex = bulanAwalSelect.value;
-		var selectedTahunAwalIndex = tahunAwalSelect.value;
-        var selectedBulanAkhirIndex = bulanAkhirSelect.value;
-        var selectedTahunAkhirIndex = tahunAkhirSelect.value;
-
-		if (selectedBulanAwalIndex && selectedTahunAwalIndex && selectedBulanAkhirIndex && selectedTahunAkhirIndex) {
-			var namaBulanAwalDipilih = bulan[selectedBulanAwalIndex - 1];
-			var namaBulanAkhirDipilih = bulan[selectedBulanAkhirIndex - 1];
-			rentangDipilihSpan.textContent =
-				namaBulanAwalDipilih + " " + selectedTahunAwalIndex + " - " +
-                namaBulanAkhirDipilih + " " + selectedTahunAkhirIndex;
-		} else {
-			rentangDipilihSpan.textContent = "Belum ada rentang yang dipilih";
-		}
-	});
-</script>
+<script src="node_modules\html2pdf.js\dist\html2pdf.bundle.min.js"></script>
+<script type="module" src="public\js\script.js"></script>
