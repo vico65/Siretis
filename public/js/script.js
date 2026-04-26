@@ -38,6 +38,9 @@ var bulanAwalSelect = document.getElementById("bulan_awal_select");
 var bulanAkhirSelect = document.getElementById("bulan_akhir_select");
 
 var rentangDipilihSpan = document.querySelector(".rentang_dipilih");
+var bulanDipilihSpan = document.querySelector(".bulan_dipilih");
+var iuranDipilihSpan = document.querySelector(".iuran_dipilih");
+
 var tahunAwalSelect = document.getElementById("tahun_awal_select");
 var tahunAkhirSelect = document.getElementById("tahun_akhir_select");
 var konfirmasiButton = document.getElementById("konfirmasi_button");
@@ -61,16 +64,19 @@ bulan.forEach(function (bulanNama, index) {
 });
 
 // mengisi variabel dengan nilai yang dipilih saat ini
-var selectedBulanAwalIndex = bulanAwalSelect.value;
-var selectedTahunAwalIndex = tahunAwalSelect.value;
-var selectedBulanAkhirIndex = bulanAkhirSelect.value;
-var selectedTahunAkhirIndex = tahunAkhirSelect.value;
-
+var selectedBulanAwalIndex = "";
+var selectedTahunAwalIndex = "";
+var selectedBulanAkhirIndex = "";
+var selectedTahunAkhirIndex = "";
 var bulanTahunAwal = "";
 var bulanTahunAkhir = "";
 
 // event ketika konfirmasi button diklik
 konfirmasiButton.addEventListener("click", function () {
+    selectedBulanAwalIndex = bulanAwalSelect.value;
+    selectedTahunAwalIndex = tahunAwalSelect.value;
+    selectedBulanAkhirIndex = bulanAkhirSelect.value;
+    selectedTahunAkhirIndex = tahunAkhirSelect.value;
     var namaBulanAwalDipilih = "";
     var namaBulanAkhirDipilih = "";
 
@@ -81,11 +87,15 @@ konfirmasiButton.addEventListener("click", function () {
         selectedBulanAkhirIndex &&
         selectedTahunAkhirIndex
     ) {
-        // cek kalo bulan awal yang dipilih cuma 1 digit, tambahin 0 di depannya
-        if (selectedBulanAwalIndex.length == 1) {
-            namaBulanAwalDipilih = "0" + selectedBulanAwalIndex;
-            namaBulanAkhirDipilih = "0" + selectedBulanAkhirIndex;
+        // cek kalo bulan akhir yang dipilih lebih kecil dari bulan awal, kasih tau user
+        if(selectedBulanAkhirIndex < selectedBulanAwalIndex || selectedTahunAkhirIndex < selectedTahunAwalIndex) {
+            rentangDipilihSpan.textContent = "Tanggal akhir harus lebih besar dari tanggal awal";
+            return;
         }
+
+        // cek kalo bulan awal yang dipilih cuma 1 digit, tambahin 0 di depannya
+        namaBulanAwalDipilih = monthFormat(selectedBulanAwalIndex);
+        namaBulanAkhirDipilih = monthFormat(selectedBulanAkhirIndex);
 
         bulanTahunAwal = selectedTahunAwalIndex + "-" + namaBulanAwalDipilih;
         bulanTahunAkhir = selectedTahunAkhirIndex + "-" + namaBulanAkhirDipilih;
@@ -93,15 +103,24 @@ konfirmasiButton.addEventListener("click", function () {
         rentangDipilihSpan.textContent = bulanTahunAwal + " s.d. " + bulanTahunAkhir;
 
         var i = selectedBulanAwalIndex;
-        var y = 0;
-        while (i <= selectedBulanAkhirIndex) {
-            console.log(selectedTahunAwalIndex+"-"+i)
+        var y = selectedTahunAwalIndex;
+        var jumlahIuran = 0;
 
-            // pr : tambahkan fungsi menambah angka 0 di depan bulan 1 digit
-            y += cekTarifBulan(selectedTahunAwalIndex+"-0"+i, "Kelas III");
-            i++;
-        }
-        console.log(y);
+        console.log(i)
+
+        if (selectedTahunAwalIndex != selectedTahunAkhirIndex) {
+            while (i <= 12) {
+                jumlahIuran += cekTarifBulan(y + "-" + monthFormat(i), "Kelas III");
+                i++;
+            }
+        } 
+
+        // while (i <= selectedBulanAkhirIndex) {
+        //     jumlahIuran += cekTarifBulan(selectedTahunAwalIndex+monthFormat(i), "Kelas III");
+        //     i++;
+        // }
+        iuranDipilihSpan.textContent = "Rp " + jumlahIuran.toLocaleString("id-ID");
+        bulanDipilihSpan.textContent = selectedBulanAkhirIndex - selectedBulanAwalIndex + 1 + " bulan";
     } else {
         rentangDipilihSpan.textContent = "Belum ada rentang yang dipilih";
     }
@@ -119,6 +138,14 @@ function cekTarifBulan(bulanDicari, kelasDicari) {
         return dataDitemukan.tarif[kelasDicari];
     } else {
         return "Tarif tidak ditemukan";
+    }
+}
+
+function monthFormat(bulan) {
+    if (bulan.length == 1) {
+        return "0" + bulan;
+    } else {
+        return bulan;
     }
 }
 
