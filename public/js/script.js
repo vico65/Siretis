@@ -103,22 +103,38 @@ konfirmasiButton.addEventListener("click", function () {
         rentangDipilihSpan.textContent = bulanTahunAwal + " s.d. " + bulanTahunAkhir;
 
         var i = selectedBulanAwalIndex;
-        var y = selectedTahunAwalIndex;
+        var y = parseInt(selectedTahunAwalIndex);
+        var jumlahTahunRekon = selectedTahunAkhirIndex - selectedTahunAwalIndex;
+        var z = 0; //z digunakan dalam perulangan tahun
         var jumlahIuran = 0;
 
-        console.log(i)
+        while(z <= jumlahTahunRekon) {
+            console.log(i)
 
-        if (selectedTahunAwalIndex != selectedTahunAkhirIndex) {
-            while (i <= 12) {
-                jumlahIuran += cekTarifBulan(y + "-" + monthFormat(i), "Kelas III");
+            jumlahIuran += cekTarifBulan(y + "-" + monthFormat(i), "Kelas III");
+
+            // cek apakah sudah di tahun terakhir dan bulan terakhir
+            if(i == selectedBulanAkhirIndex && y == selectedTahunAkhirIndex) {
+                console.log(jumlahIuran)
+                break
+            }
+
+            // cek apakah bulannyo lah lebih dari 12
+            if(i == 12) {
+                i = 1;
+                z+=1;
+                y+=1;
+            } else {
                 i++;
             }
-        } 
 
-        // while (i <= selectedBulanAkhirIndex) {
-        //     jumlahIuran += cekTarifBulan(selectedTahunAwalIndex+monthFormat(i), "Kelas III");
-        //     i++;
-        // }
+            
+
+            
+
+            
+        }
+
         iuranDipilihSpan.textContent = "Rp " + jumlahIuran.toLocaleString("id-ID");
         bulanDipilihSpan.textContent = selectedBulanAkhirIndex - selectedBulanAwalIndex + 1 + " bulan";
     } else {
