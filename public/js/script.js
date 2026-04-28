@@ -63,22 +63,24 @@ bulan.forEach(function (bulanNama, index) {
     bulanAkhirSelect.appendChild(option.cloneNode(true));
 });
 
-// mengisi variabel dengan nilai yang dipilih saat ini
-var selectedBulanAwalIndex = "";
-var selectedTahunAwalIndex = "";
-var selectedBulanAkhirIndex = "";
-var selectedTahunAkhirIndex = "";
-var bulanTahunAwal = "";
-var bulanTahunAkhir = "";
-
 // event ketika konfirmasi button diklik
-konfirmasiButton.addEventListener("click", function () {
+konfirmasiButton.addEventListener("click", () => {
+
+    // mengisi variabel dengan nilai yang dipilih saat ini
+    let selectedBulanAwalIndex = "";
+    let selectedTahunAwalIndex = "";
+    let selectedBulanAkhirIndex = "";
+    let selectedTahunAkhirIndex = "";
+    let bulanTahunAwal = "";
+    let bulanTahunAkhir = "";
+
     selectedBulanAwalIndex = bulanAwalSelect.value;
     selectedTahunAwalIndex = tahunAwalSelect.value;
     selectedBulanAkhirIndex = bulanAkhirSelect.value;
     selectedTahunAkhirIndex = tahunAkhirSelect.value;
-    var namaBulanAwalDipilih = "";
-    var namaBulanAkhirDipilih = "";
+
+    let namaBulanAwalDipilih = "";
+    let namaBulanAkhirDipilih = "";
 
     // kalau setiap dropdown sudah dipilih, maka tampilkan rentang yang dipilih
     if (
@@ -87,37 +89,94 @@ konfirmasiButton.addEventListener("click", function () {
         selectedBulanAkhirIndex &&
         selectedTahunAkhirIndex
     ) {
-        // cek kalo bulan akhir yang dipilih lebih kecil dari bulan awal, kasih tau user
-        if(selectedBulanAkhirIndex < selectedBulanAwalIndex || selectedTahunAkhirIndex < selectedTahunAwalIndex) {
-            rentangDipilihSpan.textContent = "Tanggal akhir harus lebih besar dari tanggal awal";
-            return;
-        }
+        
 
         // cek kalo bulan awal yang dipilih cuma 1 digit, tambahin 0 di depannya
         namaBulanAwalDipilih = monthFormat(selectedBulanAwalIndex);
         namaBulanAkhirDipilih = monthFormat(selectedBulanAkhirIndex);
 
-        bulanTahunAwal = selectedTahunAwalIndex + "-" + namaBulanAwalDipilih;
-        bulanTahunAkhir = selectedTahunAkhirIndex + "-" + namaBulanAkhirDipilih;
+        // cek kalo bulan akhir yang dipilih lebih kecil dari bulan awal, kasih tau user
+        if(parseInt(selectedTahunAkhirIndex + namaBulanAkhirDipilih) < parseInt(selectedTahunAwalIndex + namaBulanAwalDipilih)) {
+            rentangDipilihSpan.textContent = "Tanggal akhir harus lebih besar dari tanggal awal";
+            return;
+        }
 
-        rentangDipilihSpan.textContent = bulanTahunAwal + " s.d. " + bulanTahunAkhir;
+        bulanTahunAwal = `${selectedTahunAwalIndex}-${namaBulanAwalDipilih}`;
+        bulanTahunAkhir = `${selectedTahunAkhirIndex}-${namaBulanAkhirDipilih}`;
+        rentangDipilihSpan.textContent = `${bulanTahunAwal} s.d. ${bulanTahunAkhir}`;
 
-        var i = selectedBulanAwalIndex;
-        var y = parseInt(selectedTahunAwalIndex);
-        var jumlahTahunRekon = selectedTahunAkhirIndex - selectedTahunAwalIndex;
-        var z = 0; //z digunakan dalam perulangan tahun
-        var jumlahIuran = 0;
+        const jumlahTahunRekon = selectedTahunAkhirIndex - selectedTahunAwalIndex;
+        let x = hitungJumlahBulanRekon(selectedBulanAwalIndex, selectedBulanAkhirIndex, selectedTahunAwalIndex, selectedTahunAkhirIndex, bulanTahunAwal, bulanTahunAkhir, jumlahTahunRekon); //x digunakan untuk menghitung jumlah bulan yang dipilih
+
+        // cek kalo bulan lah lebih dari 24 bulan
+        if(x > 24) {
+            rentangDipilihSpan.textContent = "Tunggakan tidak mungkin melebihi 24 bulan";
+            return;
+        }
+
+        let i = parseInt(selectedBulanAwalIndex);
+        let y = parseInt(selectedTahunAwalIndex);
+        let z = 0; //z digunakan dalam perulangan tahun
+        let jumlahIuran = 0;
+
+        // tahun 2021 - 2026 itu tarifnya sama
+        let tahunDefault = ["2021", "2022", "2023", "2024", "2025", "2026"];
+        if(tahunDefault.includes(selectedTahunAwalIndex) && tahunDefault.includes(selectedTahunAkhirIndex)) {
+            jumlahIuran = x * cekTarifBulan("2021-01", "Kelas III");
+        } else {
+            while(z <= jumlahTahunRekon) {
+                jumlahIuran += cekTarifBulan(`${y}-${monthFormat(i.toString())}`, "Kelas III");
+    
+                // cek apakah sudah di tahun terakhir dan bulan terakhir
+                if(i == selectedBulanAkhirIndex && y == selectedTahunAkhirIndex) break;
+    
+                // cek apakah bulannyo lah lebih dari 12
+                if(i == 12) {
+                    i = 1;
+                    z+=1;
+                    y+=1;
+                } else {
+                    i++;
+                }
+            }
+        }
+        iuranDipilihSpan.textContent = `Rp ${jumlahIuran.toLocaleString("id-ID")}`;
+        bulanDipilihSpan.textContent = `${x} bulan`;
+    } else {
+        rentangDipilihSpan.textContent = "Belum ada rentang yang dipilih";
+    }
+});
+
+const cekTarifBulan = (bulanDicari, kelasDicari) => {
+    const dataDitemukan = data.find(
+        (item) =>
+            bulanDicari >= item.periode_mulai &&
+            bulanDicari <= item.periode_akhir
+    );
+
+    return dataDitemukan ? dataDitemukan.tarif[kelasDicari] : "Tarif tidak ditemukan";
+}
+
+const monthFormat = (bulan) => {
+    // ATURAN BARU: Javascript sekarang punya fungsi padStart(). 
+    // Ini otomatis memastikan string panjangnya 2 karakter, jika kurang ditambah "0" di depannya.
+    return String(bulan).padStart(2, '0');
+}
+
+// fungsi menghitung jumlah bulan rekon
+const hitungJumlahBulanRekon = (bulanAwal, bulanAkhir, tahunAwal, tahunAkhir, bulanTahunAwal, bulanTahunAkhir, jumlahTahunRekon) => {
+        let i = parseInt(bulanAwal);
+        let y = parseInt(tahunAwal);
+
+        let z = 0; //z digunakan dalam perulangan tahun
+        let x = 0; //x digunakan untuk menghitung jumlah bulan yang dipilih
 
         while(z <= jumlahTahunRekon) {
-            console.log(i)
-
-            jumlahIuran += cekTarifBulan(y + "-" + monthFormat(i), "Kelas III");
-
+            
+            x++;
+            console.log(x)
             // cek apakah sudah di tahun terakhir dan bulan terakhir
-            if(i == selectedBulanAkhirIndex && y == selectedTahunAkhirIndex) {
-                console.log(jumlahIuran)
-                break
-            }
+            if(i == bulanAkhir && y == tahunAkhir) break;
 
             // cek apakah bulannyo lah lebih dari 12
             if(i == 12) {
@@ -127,42 +186,8 @@ konfirmasiButton.addEventListener("click", function () {
             } else {
                 i++;
             }
-
-            
-
-            
-
-            
         }
-
-        iuranDipilihSpan.textContent = "Rp " + jumlahIuran.toLocaleString("id-ID");
-        bulanDipilihSpan.textContent = selectedBulanAkhirIndex - selectedBulanAwalIndex + 1 + " bulan";
-    } else {
-        rentangDipilihSpan.textContent = "Belum ada rentang yang dipilih";
-    }
-});
-
-function cekTarifBulan(bulanDicari, kelasDicari) {
-    // Cari di array mana bulan ini berada
-    const dataDitemukan = data.find(
-        (item) =>
-            bulanDicari >= item.periode_mulai &&
-            bulanDicari <= item.periode_akhir,
-    );
-
-    if (dataDitemukan) {
-        return dataDitemukan.tarif[kelasDicari];
-    } else {
-        return "Tarif tidak ditemukan";
-    }
-}
-
-function monthFormat(bulan) {
-    if (bulan.length == 1) {
-        return "0" + bulan;
-    } else {
-        return bulan;
-    }
+        return x;
 }
 
 // html2pdf(element);
