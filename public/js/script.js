@@ -2,7 +2,7 @@ import { data } from "./iuran.js";
 
 console.log("JS loaded");
 
-var bulan = [
+let bulan = [
     "Januari",
     "Februari",
     "Maret",
@@ -17,7 +17,7 @@ var bulan = [
     "Desember",
 ];
 
-var tahun = [
+let tahun = [
     "2014",
     "2015",
     "2016",
@@ -34,20 +34,25 @@ var tahun = [
 ];
 
 // deklarasi elemen-elemen yang dibutuhkan
-var bulanAwalSelect = document.getElementById("bulan_awal_select");
-var bulanAkhirSelect = document.getElementById("bulan_akhir_select");
+let bulanAwalSelect = document.getElementById("bulan_awal_select");
+let bulanAkhirSelect = document.getElementById("bulan_akhir_select");
 
-var rentangDipilihSpan = document.querySelector(".rentang_dipilih");
-var bulanDipilihSpan = document.querySelector(".bulan_dipilih");
-var iuranDipilihSpan = document.querySelector(".iuran_dipilih");
+let rentangDipilihSpan = document.querySelector(".rentang_dipilih");
+let bulanDipilihSpan = document.querySelector(".bulan_dipilih");
+let iuranDipilihSpan = document.querySelector(".iuran_dipilih");
 
-var tahunAwalSelect = document.getElementById("tahun_awal_select");
-var tahunAkhirSelect = document.getElementById("tahun_akhir_select");
-var konfirmasiButton = document.getElementById("konfirmasi_button");
+let tahunAwalSelect = document.getElementById("tahun_awal_select");
+let tahunAkhirSelect = document.getElementById("tahun_akhir_select");
+let konfirmasiButton = document.getElementById("konfirmasi_button");
+
+let checkboxBulanSaja = document.getElementById("checkbox_bulan");
+let statusCheckboxBulanSaja = false; //variabel untuk menyimpan status checkbox bulan saja
+let containerTanggalAkhir = document.getElementById("container_tanggal_akhir"); 
+
 
 // isi dropdown tahun
 tahun.forEach(function (tahunNama) {
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = tahunNama; // Nilai tahun
     option.text = tahunNama; // Nama tahun
     tahunAwalSelect.appendChild(option);
@@ -56,12 +61,25 @@ tahun.forEach(function (tahunNama) {
 
 // isi dropdown bulan
 bulan.forEach(function (bulanNama, index) {
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = index + 1; // Nilai bulan (1-12)
     option.text = bulanNama; // Nama bulan
     bulanAwalSelect.appendChild(option);
     bulanAkhirSelect.appendChild(option.cloneNode(true));
 });
+
+// event ketika checbox dipencet
+checkboxBulanSaja.addEventListener("change", (e) => {
+    if(checkboxBulanSaja.checked) {
+        statusCheckboxBulanSaja = true;
+        containerTanggalAkhir.classList.add("hidden");
+    } else {
+        statusCheckboxBulanSaja = false;
+        containerTanggalAkhir.classList.remove("hidden");
+    }
+
+    console.log(statusCheckboxBulanSaja);
+});                  
 
 // event ketika konfirmasi button diklik
 konfirmasiButton.addEventListener("click", () => {

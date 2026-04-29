@@ -10,6 +10,12 @@
 	<body class="m-2 element">
 		<h1 class="font-black font-popins text-2xl mb-10">Lampiran BA</h1>
 
+		<!-- pilihan untuk 1 bulan saja -->
+		 <div class="mb-2 px-1 flex flex-wrap gap-3 items-center">
+			<input type="checkbox" id="checkbox_bulan" class="cursor-pointer">
+			<label for="checkbox_bulan" class="font-semibold text-sm">1 Bulan Saja</label>
+		 </div>
+
 		<!-- bulan dan tahun awal -->
 		<div class="border-2 rounded-xl border-black p-2 mb-5">
 			<p class="font-semibold">Bulan Awal</p>
@@ -29,7 +35,7 @@
 		</div>
 
 		<!-- bulan dan tahun akhir -->
-		<div class="border-2 rounded-xl border-black p-2">
+		<div class="border-2 rounded-xl border-black p-2" id="container_tanggal_akhir">
 			<p class="font-semibold">Bulan Akhir</p>
 			<div class="">
 				<label for="my-selection">Bulan:</label>
