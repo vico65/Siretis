@@ -77,8 +77,6 @@ checkboxBulanSaja.addEventListener("change", (e) => {
         statusCheckboxBulanSaja = false;
         containerTanggalAkhir.classList.remove("hidden");
     }
-
-    console.log(statusCheckboxBulanSaja);
 });                  
 
 // event ketika konfirmasi button diklik
@@ -99,32 +97,28 @@ konfirmasiButton.addEventListener("click", () => {
 
     let namaBulanAwalDipilih = "";
     let namaBulanAkhirDipilih = "";
+    let statusCheckDropdown = statusCheckboxBulanSaja ?  selectedBulanAwalIndex && selectedTahunAwalIndex : selectedBulanAwalIndex && selectedTahunAwalIndex && selectedBulanAkhirIndex && selectedTahunAkhirIndex;
+    console.log(statusCheckDropdown);
+    console.log(selectedBulanAwalIndex, selectedTahunAwalIndex, selectedBulanAkhirIndex, selectedTahunAkhirIndex);
 
     // kalau setiap dropdown sudah dipilih, maka tampilkan rentang yang dipilih
-    if (
-        selectedBulanAwalIndex &&
-        selectedTahunAwalIndex &&
-        selectedBulanAkhirIndex &&
-        selectedTahunAkhirIndex
-    ) {
-        
-
+    if (statusCheckDropdown) {
         // cek kalo bulan awal yang dipilih cuma 1 digit, tambahin 0 di depannya
         namaBulanAwalDipilih = monthFormat(selectedBulanAwalIndex);
         namaBulanAkhirDipilih = monthFormat(selectedBulanAkhirIndex);
 
         // cek kalo bulan akhir yang dipilih lebih kecil dari bulan awal, kasih tau user
-        if(parseInt(selectedTahunAkhirIndex + namaBulanAkhirDipilih) < parseInt(selectedTahunAwalIndex + namaBulanAwalDipilih)) {
+        if(!statusCheckboxBulanSaja && parseInt(selectedTahunAkhirIndex + namaBulanAkhirDipilih) < parseInt(selectedTahunAwalIndex + namaBulanAwalDipilih)) {
             rentangDipilihSpan.textContent = "Tanggal akhir harus lebih besar dari tanggal awal";
             return;
         }
 
         bulanTahunAwal = `${selectedTahunAwalIndex}-${namaBulanAwalDipilih}`;
         bulanTahunAkhir = `${selectedTahunAkhirIndex}-${namaBulanAkhirDipilih}`;
-        rentangDipilihSpan.textContent = `${bulanTahunAwal} s.d. ${bulanTahunAkhir}`;
+        rentangDipilihSpan.textContent = statusCheckboxBulanSaja ? `${bulanTahunAwal}` :`${bulanTahunAwal} s.d. ${bulanTahunAkhir}`;
 
         const jumlahTahunRekon = selectedTahunAkhirIndex - selectedTahunAwalIndex;
-        let x = hitungJumlahBulanRekon(selectedBulanAwalIndex, selectedBulanAkhirIndex, selectedTahunAwalIndex, selectedTahunAkhirIndex, bulanTahunAwal, bulanTahunAkhir, jumlahTahunRekon); //x digunakan untuk menghitung jumlah bulan yang dipilih
+        let x = !statusCheckboxBulanSaja ? hitungJumlahBulanRekon(selectedBulanAwalIndex, selectedBulanAkhirIndex, selectedTahunAwalIndex, selectedTahunAkhirIndex, bulanTahunAwal, bulanTahunAkhir, jumlahTahunRekon) : 1;
 
         // cek kalo bulan lah lebih dari 24 bulan
         if(x > 24) {
@@ -139,7 +133,7 @@ konfirmasiButton.addEventListener("click", () => {
 
         // tahun 2021 - 2026 itu tarifnya sama
         let tahunDefault = ["2021", "2022", "2023", "2024", "2025", "2026"];
-        if(tahunDefault.includes(selectedTahunAwalIndex) && tahunDefault.includes(selectedTahunAkhirIndex)) {
+        if(tahunDefault.includes(selectedTahunAwalIndex) || (tahunDefault.includes(selectedTahunAkhirIndex) && !statusCheckboxBulanSaja)) {
             jumlahIuran = x * cekTarifBulan("2021-01", "Kelas III");
         } else {
             while(z <= jumlahTahunRekon) {
@@ -162,6 +156,8 @@ konfirmasiButton.addEventListener("click", () => {
         bulanDipilihSpan.textContent = `${x} bulan`;
     } else {
         rentangDipilihSpan.textContent = "Belum ada rentang yang dipilih";
+        iuranDipilihSpan.textContent = `-`;
+        bulanDipilihSpan.textContent = `-`;
     }
 });
 
@@ -192,7 +188,6 @@ const hitungJumlahBulanRekon = (bulanAwal, bulanAkhir, tahunAwal, tahunAkhir, bu
         while(z <= jumlahTahunRekon) {
             
             x++;
-            console.log(x)
             // cek apakah sudah di tahun terakhir dan bulan terakhir
             if(i == bulanAkhir && y == tahunAkhir) break;
 
