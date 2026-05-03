@@ -40,6 +40,7 @@ let bulanAkhirSelect = document.getElementById("bulan_akhir_select");
 let rentangDipilihSpan = document.querySelector(".rentang_dipilih");
 let bulanDipilihSpan = document.querySelector(".bulan_dipilih");
 let iuranDipilihSpan = document.querySelector(".iuran_dipilih");
+let kelasDipilihSpan = document.querySelector("#kelas_select");
 
 let tahunAwalSelect = document.getElementById("tahun_awal_select");
 let tahunAkhirSelect = document.getElementById("tahun_akhir_select");
@@ -81,7 +82,6 @@ checkboxBulanSaja.addEventListener("change", (e) => {
 
 // event ketika konfirmasi button diklik
 konfirmasiButton.addEventListener("click", () => {
-
     // mengisi variabel dengan nilai yang dipilih saat ini
     let selectedBulanAwalIndex = "";
     let selectedTahunAwalIndex = "";
@@ -95,17 +95,21 @@ konfirmasiButton.addEventListener("click", () => {
     selectedBulanAkhirIndex = bulanAkhirSelect.value;
     selectedTahunAkhirIndex = tahunAkhirSelect.value;
 
+    let kelasDipilih = kelasDipilihSpan.value;
     let namaBulanAwalDipilih = "";
     let namaBulanAkhirDipilih = "";
     let statusCheckDropdown = statusCheckboxBulanSaja ?  selectedBulanAwalIndex && selectedTahunAwalIndex : selectedBulanAwalIndex && selectedTahunAwalIndex && selectedBulanAkhirIndex && selectedTahunAkhirIndex;
-    console.log(statusCheckDropdown);
-    console.log(selectedBulanAwalIndex, selectedTahunAwalIndex, selectedBulanAkhirIndex, selectedTahunAkhirIndex);
 
     // kalau setiap dropdown sudah dipilih, maka tampilkan rentang yang dipilih
     if (statusCheckDropdown) {
         // cek kalo bulan awal yang dipilih cuma 1 digit, tambahin 0 di depannya
         namaBulanAwalDipilih = monthFormat(selectedBulanAwalIndex);
         namaBulanAkhirDipilih = monthFormat(selectedBulanAkhirIndex);
+
+        if(kelasDipilihSpan.value == "0") {
+            rentangDipilihSpan.textContent = "Pilih Kelas Terlebih Dahulu";
+            return;
+        }
 
         // cek kalo bulan akhir yang dipilih lebih kecil dari bulan awal, kasih tau user
         if(!statusCheckboxBulanSaja && parseInt(selectedTahunAkhirIndex + namaBulanAkhirDipilih) < parseInt(selectedTahunAwalIndex + namaBulanAwalDipilih)) {
@@ -134,10 +138,10 @@ konfirmasiButton.addEventListener("click", () => {
         // tahun 2021 - 2026 itu tarifnya sama
         let tahunDefault = ["2021", "2022", "2023", "2024", "2025", "2026"];
         if(tahunDefault.includes(selectedTahunAwalIndex) || (tahunDefault.includes(selectedTahunAkhirIndex) && !statusCheckboxBulanSaja)) {
-            jumlahIuran = x * cekTarifBulan("2021-01", "Kelas III");
+            jumlahIuran = x * cekTarifBulan("2021-01", kelasDipilih);
         } else {
             while(z <= jumlahTahunRekon) {
-                jumlahIuran += cekTarifBulan(`${y}-${monthFormat(i.toString())}`, "Kelas III");
+                jumlahIuran += cekTarifBulan(`${y}-${monthFormat(i.toString())}`, kelasDipilih);
     
                 // cek apakah sudah di tahun terakhir dan bulan terakhir
                 if(i == selectedBulanAkhirIndex && y == selectedTahunAkhirIndex) break;
