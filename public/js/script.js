@@ -33,6 +33,22 @@ let tahun = [
     "2026",
 ];
 
+const monthFormat = (bulan) => {
+    // ATURAN BARU: Javascript sekarang punya fungsi padStart(). 
+    // Ini otomatis memastikan string panjangnya 2 karakter, jika kurang ditambah "0" di depannya.
+    return String(bulan).padStart(2, '0');
+}
+
+const cekTarifBulan = (bulanDicari, kelasDicari) => {
+    const dataDitemukan = data.find(
+        (item) =>
+            bulanDicari >= item.periode_mulai &&
+            bulanDicari <= item.periode_akhir
+    );
+
+    return dataDitemukan ? dataDitemukan.tarif[kelasDicari] : "Tarif tidak ditemukan";
+}
+
 // deklarasi elemen-elemen yang dibutuhkan
 let bulanAwalSelect = document.getElementById("bulan_awal_select");
 let bulanAkhirSelect = document.getElementById("bulan_akhir_select");
@@ -50,6 +66,13 @@ let checkboxBulanSaja = document.getElementById("checkbox_bulan");
 let statusCheckboxBulanSaja = false; //variabel untuk menyimpan status checkbox bulan saja
 let containerTanggalAkhir = document.getElementById("container_tanggal_akhir"); 
 
+let currentMonth = new Date().getMonth() + 1; 
+let currentYear = 2026;
+let checkboxBulanBerjalan = document.getElementById("checkbox_bulan_berjalan");
+let statusCheckboxBulanBerjalan = false;
+
+// console.log(`${currentYear}-${monthFormat(currentMonth)}`); // cek apakah monthFormat berfungsi dengan benar
+// console.log(cekTarifBulan(`${currentYear}-${monthFormat(currentMonth)}`, kelasDipilihSpan)); // cek apakah cekTarifBulan berfungsi dengan benar
 
 // isi dropdown tahun
 tahun.forEach(function (tahunNama) {
@@ -77,6 +100,14 @@ checkboxBulanSaja.addEventListener("change", (e) => {
     } else {
         statusCheckboxBulanSaja = false;
         containerTanggalAkhir.classList.remove("hidden");
+    }
+});       
+
+checkboxBulanBerjalan.addEventListener("change", (e) => {
+    if(checkboxBulanBerjalan.checked) {
+        statusCheckboxBulanBerjalan = true;
+    } else {
+        statusCheckboxBulanBerjalan = false;
     }
 });                  
 
@@ -119,10 +150,13 @@ konfirmasiButton.addEventListener("click", () => {
 
         bulanTahunAwal = `${selectedTahunAwalIndex}-${namaBulanAwalDipilih}`;
         bulanTahunAkhir = `${selectedTahunAkhirIndex}-${namaBulanAkhirDipilih}`;
-        rentangDipilihSpan.textContent = statusCheckboxBulanSaja ? `${bulanTahunAwal}` :`${bulanTahunAwal} s.d. ${bulanTahunAkhir}`;
+
+        let rentangDipilihText = statusCheckboxBulanSaja ? `${bulanTahunAwal}` :`${bulanTahunAwal} s.d. ${bulanTahunAkhir}`;
+        
 
         const jumlahTahunRekon = selectedTahunAkhirIndex - selectedTahunAwalIndex;
         let x = !statusCheckboxBulanSaja ? hitungJumlahBulanRekon(selectedBulanAwalIndex, selectedBulanAkhirIndex, selectedTahunAwalIndex, selectedTahunAkhirIndex, bulanTahunAwal, bulanTahunAkhir, jumlahTahunRekon) : 1;
+        
 
         // cek kalo bulan lah lebih dari 24 bulan
         if(x > 24) {
@@ -133,7 +167,15 @@ konfirmasiButton.addEventListener("click", () => {
         let i = parseInt(selectedBulanAwalIndex);
         let y = parseInt(selectedTahunAwalIndex);
         let z = 0; //z digunakan dalam perulangan tahun
-        let jumlahIuran = 0;
+        let jumlahIuran = statusCheckboxBulanBerjalan ? cekTarifBulan(`${currentYear}-${monthFormat(currentMonth)}`, kelasDipilih) : 0; //variabel untuk menyimpan jumlah iuran yang harus dibayar
+
+        // cek apakah ada bulan berjalan
+        if(statusCheckboxBulanBerjalan) {
+            x += 1;
+            rentangDipilihText += ` dan ${currentYear}-${monthFormat(currentMonth)}`; // tambahin bulan berjalan ke rentang yang dipilih
+        } 
+
+        rentangDipilihSpan.textContent = rentangDipilihText;
 
         // tahun 2021 - 2026 itu tarifnya sama
         let tahunDefault = ["2021", "2022", "2023", "2024", "2025", "2026"];
@@ -165,21 +207,9 @@ konfirmasiButton.addEventListener("click", () => {
     }
 });
 
-const cekTarifBulan = (bulanDicari, kelasDicari) => {
-    const dataDitemukan = data.find(
-        (item) =>
-            bulanDicari >= item.periode_mulai &&
-            bulanDicari <= item.periode_akhir
-    );
 
-    return dataDitemukan ? dataDitemukan.tarif[kelasDicari] : "Tarif tidak ditemukan";
-}
 
-const monthFormat = (bulan) => {
-    // ATURAN BARU: Javascript sekarang punya fungsi padStart(). 
-    // Ini otomatis memastikan string panjangnya 2 karakter, jika kurang ditambah "0" di depannya.
-    return String(bulan).padStart(2, '0');
-}
+
 
 // fungsi menghitung jumlah bulan rekon
 const hitungJumlahBulanRekon = (bulanAwal, bulanAkhir, tahunAwal, tahunAkhir, bulanTahunAwal, bulanTahunAkhir, jumlahTahunRekon) => {
@@ -206,6 +236,8 @@ const hitungJumlahBulanRekon = (bulanAwal, bulanAkhir, tahunAwal, tahunAkhir, bu
         }
         return x;
 }
+
+
 
 // html2pdf(element);
 

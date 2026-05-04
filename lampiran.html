@@ -10,72 +10,113 @@
 	<body class="m-2 element">
 		<h1 class="font-black font-popins text-2xl mb-10">Lampiran BA</h1>
 
-		<!-- pilihan kelas -->
-		<div class="mb-2  flex flex-wrap gap-3 items-center border-2 border-black w-fit rounded">
-			<label for="my-selection" class="uppercase bg-yellow-400 font-semibold	 px-2 py-1">Kelas</label>
-				<select id="kelas_select" name="myOption">
-					<option value="0" disabled selected>Pilih Kelas</option>
-					<option value="1">Kelas I</option>
-					<option value="2">Kelas II</option>
-					<option value="3">Kelas III</option>
-				</select>
-		</div>
-
-		<!-- pilihan untuk 1 bulan saja -->
-		<div class="mb-2 px-1 flex flex-wrap gap-3 items-center">
-			<input type="checkbox" id="checkbox_bulan" class="cursor-pointer" />
-			<label for="checkbox_bulan" class="font-semibold text-sm"
-				>1 Bulan Saja</label
-			>
-		</div>
-
-		<!-- bulan dan tahun awal -->
-		<div class="border-2 rounded-xl border-black p-2 mb-5">
-			<p class="font-semibold">Bulan Awal</p>
-			<div class="">
-				<label for="my-selection">Bulan:</label>
-				<select id="bulan_awal_select" name="myOption">
-					<option value="04" disabled selected>Pilih Bulan</option>
-				</select>
+		<div class=" flex flex-row gap-4">
+			<!-- bagian form informasi rekon -->
+			<div class="w-1/4  border-2 border-black rounded-lg">
+				<h2 class="font-bold text-xl mb-3 border-b-2 p-2 bg-amber-200">Informasi Data Rekonsiliasi</h2>
+				
+				<div class="py-1 px-2	">
+					<div
+						class="mb-2 flex flex-wrap gap-3 items-center border-2 border-black w-fit rounded"
+					>
+						<label
+							for="my-selection"
+							class="uppercase bg-yellow-400 font-semibold px-1 text-sm"
+							>Kelas</label
+						>
+						<select id="kelas_select" name="myOption" class="text-sm">
+							<option value="0" disabled selected>Pilih Kelas</option>
+							<option value="1">Kelas I</option>
+							<option value="2">Kelas II</option>
+							<option value="3">Kelas III</option>
+						</select>
+					</div>
+	
+					<!-- pilihan untuk 1 bulan saja -->
+					<div class="mb-2 px-1 flex flex-wrap gap-3 items-center">
+						<input
+							type="checkbox"
+							id="checkbox_bulan"
+							class="cursor-pointer"
+						/>
+						<label for="checkbox_bulan" class="font-semibold text-sm"
+							>1 Bulan Saja</label
+						>
+					</div>
+	
+					<!-- pilihan untuk bulan berjalan -->
+					<div class="mb-2 px-1 flex flex-wrap gap-3 items-center">
+						<input
+							type="checkbox"
+							id="checkbox_bulan_berjalan"
+							class="cursor-pointer"
+						/>
+						<label
+							for="checkbox_bulan_berjalan"
+							class="font-semibold text-sm"
+							>Bulan Berjalan</label
+						>
+					</div>
+				</div>
+				<!-- pilihan kelas -->
 			</div>
 
-			<div class="">
-				<label for="my-selection">Tahun:</label>
-				<select id="tahun_awal_select" name="myOption">
-					<option value="2024" disabled selected>2024</option>
-				</select>
+			<!-- bagian form input bulan n tahun rekon -->
+			<div class="w-3/4">
+				<!-- bulan dan tahun awal -->
+				<div class="border-2 rounded-xl border-black p-2 mb-5">
+					<p class="font-semibold">Bulan Awal</p>
+					<div class="">
+						<label for="my-selection">Bulan:</label>
+						<select id="bulan_awal_select" name="myOption">
+							<option value="04" disabled selected>
+								Pilih Bulan
+							</option>
+						</select>
+					</div>
+
+					<div class="">
+						<label for="my-selection">Tahun:</label>
+						<select id="tahun_awal_select" name="myOption">
+							<option value="2024" disabled selected>2024</option>
+						</select>
+					</div>
+				</div>
+
+				<!-- bulan dan tahun akhir -->
+				<div
+					class="border-2 rounded-xl border-black p-2"
+					id="container_tanggal_akhir"
+				>
+					<p class="font-semibold">Bulan Akhir</p>
+					<div class="">
+						<label for="my-selection">Bulan:</label>
+						<select id="bulan_akhir_select" name="myOption">
+							<option value="" disabled selected>
+								Pilih Bulan
+							</option>
+						</select>
+					</div>
+
+					<div class="">
+						<label for="my-selection">Tahun:</label>
+						<select id="tahun_akhir_select" name="myOption">
+							<option value="" selected>Pilih Tahun</option>
+						</select>
+					</div>
+				</div>
+				</div>
 			</div>
 		</div>
 
-		<!-- bulan dan tahun akhir -->
-		<div
-			class="border-2 rounded-xl border-black p-2"
-			id="container_tanggal_akhir"
-		>
-			<p class="font-semibold">Bulan Akhir</p>
-			<div class="">
-				<label for="my-selection">Bulan:</label>
-				<select id="bulan_akhir_select" name="myOption">
-					<option value="" disabled selected>Pilih Bulan</option>
-				</select>
-			</div>
-
-			<div class="">
-				<label for="my-selection">Tahun:</label>
-				<select id="tahun_akhir_select" name="myOption">
-					<option value="" selected>Pilih Tahun</option>
-				</select>
-			</div>
-		</div>
-
-		<div class="mt-2">
-			<button
-				id="konfirmasi_button"
-				class="text-white font-semibold py-2 px-3 rounded-full bg-green-700 hover:bg-green-600 cursor-pointer"
-			>
-				Konfirmasi
-			</button>
-		</div>
+		<!-- tombol konfirmasi rekon -->
+				<div class="mt-2">
+					<button
+						id="konfirmasi_button"
+						class="text-white font-semibold py-2 px-3 rounded-full bg-green-700 hover:bg-green-600 cursor-pointer"
+					>
+						Konfirmasi
+					</button>
 
 		<div class="p-3 bg-amber-200 mt-3 border-2 border-black rounded-lg">
 			<h2 class="font-bold mb-2">INFO IURAN</h2>
