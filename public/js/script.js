@@ -52,7 +52,34 @@ checkboxBulanSaja.addEventListener("change", (e) => {
     containerTanggalAkhir.classList.toggle("hidden");
 });       
 
-checkboxBulanBerjalan.addEventListener("change", (e) => statusCheckboxBulanBerjalan = e.target.checked);                  
+checkboxBulanBerjalan.addEventListener("change", (e) => statusCheckboxBulanBerjalan = e.target.checked);  
+
+export const jumlahIuran = (bulanAwal, tahunAwal, tahunAkhir, jumlahBulan, kelas) => {
+    let i = parseInt(bulanAwal);
+    let y = parseInt(tahunAwal);
+    let z = 0; //z digunakan dalam perulangan tahun
+    const tahunDefault = ["2021", "2022", "2023", "2024", "2025", "2026"];
+    let jumlah = 0; //variabel untuk menyimpan jumlah iuran yang harus dibayar
+
+    if(tahunDefault.includes(tahunAwal) && (statusCheckboxBulanSaja || tahunDefault.includes(tahunAkhir))){
+        jumlah += jumlahBulan * cekTarifBulan("2021-01", kelas);
+    } else {
+        while(true) {
+            jumlah += cekTarifBulan(`${y}-${monthFormat(i.toString())}`, kelas);
+
+            // cek apakah sudah di tahun terakhir dan bulan terakhir
+            if(i == selectedBulanAkhirIndex && y == selectedTahunAkhirIndex) break;
+
+            // cek apakah bulannyo lah lebih dari 12
+            if(i == 12) {
+                i = 1;
+                y+=1;
+            } else i++;
+        }
+    }
+
+    return jumlah;
+}
 
 // event ketika konfirmasi button diklik
 konfirmasiButton.addEventListener("click", () => {
@@ -62,7 +89,7 @@ konfirmasiButton.addEventListener("click", () => {
     const selectedBulanAkhirIndex = bulanAkhirSelect.value;
     const selectedTahunAkhirIndex = tahunAkhirSelect.value;
     const kelasDipilih = kelasDipilihSpan.value;
-    const tahunDefault = ["2021", "2022", "2023", "2024", "2025", "2026"];
+    
 
     let bulanTahunAwal = "";
     let bulanTahunAkhir = "";
@@ -106,44 +133,19 @@ konfirmasiButton.addEventListener("click", () => {
         return;
     }
 
-    let i = parseInt(selectedBulanAwalIndex);
-    let y = parseInt(selectedTahunAwalIndex);
-    let z = 0; //z digunakan dalam perulangan tahun
-    let jumlahIuran = 0; //variabel untuk menyimpan jumlah iuran yang harus dibayar
-
-    if(tahunDefault.includes(selectedTahunAwalIndex) && (statusCheckboxBulanSaja || tahunDefault.includes(selectedTahunAkhirIndex))){
-        jumlahIuran += jumlahBulan * cekTarifBulan("2021-01", kelasDipilih);
-    } else {
-        while(true) {
-            jumlahIuran += cekTarifBulan(`${y}-${monthFormat(i.toString())}`, kelasDipilih);
-
-            // cek apakah sudah di tahun terakhir dan bulan terakhir
-            if(i == selectedBulanAkhirIndex && y == selectedTahunAkhirIndex) break;
-
-            // cek apakah bulannyo lah lebih dari 12
-            if(i == 12) {
-                i = 1;
-                y+=1;
-            } else i++;
-        }
-    }
+    let jumlah = jumlahIuran(selectedBulanAwalIndex, selectedTahunAwalIndex, selectedBulanAkhirIndex, jumlahBulan, kelasDipilih); //variabel untuk menyimpan jumlah iuran yang harus dibayar
 
     // cek apakah ada bulan berjalan
     if(statusCheckboxBulanBerjalan) {
         jumlahBulan += 1;
-        rentangDipilihText += ` dan ${currentYear}-${monthFormat(currentMonth)}`; // tambahin bulan berjalan ke rentang yang dipilih
-        jumlahIuran += cekTarifBulan(`${currentYear}-${monthFormat(currentMonth)}`, kelasDipilih);
+        rentangDipilihText += ` dan ${currentYear}-${monthFormat(currentMonth)}`; // tambahin bulan berjalan ke rentan  g yang dipilih
+        jumlah += cekTarifBulan(`${currentYear}-${monthFormat(currentMonth)}`, kelasDipilih);
     } 
 
     rentangDipilihSpan.textContent = rentangDipilihText;
-    iuranDipilihSpan.textContent = `Rp ${jumlahIuran.toLocaleString("id-ID")}`;
+    iuranDipilihSpan.textContent = `Rp  ${jumlah.toLocaleString("id-ID")}`;
     bulanDipilihSpan.textContent = `${jumlahBulan} bulan`;
-    
 });
-
-
-
-
 
 // fungsi menghitung jumlah bulan rekon
 const hitungJumlahBulanRekon = (bulanAwal, bulanAkhir, tahunAwal, tahunAkhir, jumlahTahunRekon) => {

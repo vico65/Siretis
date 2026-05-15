@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch"
+    "dev": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch",
+    "test": "jest"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.14",
@@ -8,5 +9,8 @@
     "html2pdf.js": "^0.14.0",
     "jspdf": "^3.0.3",
     "tailwindcss": "^4.1.14"
-  }
+  },
+  "devDependencies": {
+    "jest": "^30.4.2"
+  } 
 }
