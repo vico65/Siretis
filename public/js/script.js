@@ -1,4 +1,4 @@
-import { data, bulan, tahun } from "./iuran.js";
+import { bulan, tahun, jumlahIuran, cekTarifBulan } from "./iuran.js";
 
 console.log("JS loaded");
 
@@ -19,6 +19,7 @@ let statusCheckboxBulanSaja = false; //variabel untuk menyimpan status checkbox 
 let statusCheckboxBulanBerjalan = false;
 let currentMonth = new Date().getMonth() + 1; 
 let currentYear = 2026;
+let containerLampiran = document.getElementById("container_lampiran");
 
 // padStart(). =  otomatis memastikan string panjangnya 2 karakter, jika kurang ditambah "0" di depannya.
 const monthFormat = (bulan) => String(bulan).padStart(2, '0');
@@ -27,12 +28,7 @@ const monthFormat = (bulan) => String(bulan).padStart(2, '0');
 //    Jika tidak ada, dia tidak akan membuat program error, melainkan otomatis menghasilkan 'undefined'.
 // 2. Tanda '??' (Nullish Coalescing) akan mengecek: jika nilai di sebelah kirinya 'undefined' atau 'null', 
 //    maka gunakan nilai di sebelah kanannya (yaitu angka 0).
-const cekTarifBulan = (bulanDicari, kelasDicari) => {
-    const dataDitemukan = data.find(
-        item => bulanDicari >= item.periode_mulai && bulanDicari <= item.periode_akhir
-    );
-    return dataDitemukan?.tarif[kelasDicari] ?? 0;
-}
+
 
 // ATURAN BARU: Gunakan 'new Option(text, value)' untuk mencetak elemen <option> jauh lebih singkat.
 tahun.forEach((tahunNama) => {
@@ -54,32 +50,38 @@ checkboxBulanSaja.addEventListener("change", (e) => {
 
 checkboxBulanBerjalan.addEventListener("change", (e) => statusCheckboxBulanBerjalan = e.target.checked);  
 
-export const jumlahIuran = (bulanAwal, tahunAwal, tahunAkhir, jumlahBulan, kelas) => {
-    let i = parseInt(bulanAwal);
-    let y = parseInt(tahunAwal);
-    let z = 0; //z digunakan dalam perulangan tahun
-    const tahunDefault = ["2021", "2022", "2023", "2024", "2025", "2026"];
-    let jumlah = 0; //variabel untuk menyimpan jumlah iuran yang harus dibayar
+const showLampiranContainer = () => {
+    fetch('../temp.html')
+    .then(response => response.text())
+    .then(data => {
+        containerLampiran.innerHTML = data;
+    });
 
-    if(tahunDefault.includes(tahunAwal) && (statusCheckboxBulanSaja || tahunDefault.includes(tahunAkhir))){
-        jumlah += jumlahBulan * cekTarifBulan("2021-01", kelas);
-    } else {
-        while(true) {
-            jumlah += cekTarifBulan(`${y}-${monthFormat(i.toString())}`, kelas);
+    var opt = {
+        margin:       0.5, // Beri margin agar tidak mepet tepi (dalam satuan inci)
+        filename:     'Lampiran_Rekonsiliasi.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        // pagebreak mode 'avoid-all' dan 'css' sangat ampuh mencegah elemen terpotong
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }, 
+        html2canvas:  { 
+            scale: 2, // Scale 2 membuat hasil PDF tajam, tidak buram
+            useCORS: true, // Wajib jika ada gambar/logo dari luar agar tidak hilang
+            scrollY: 0 // Mencegah bug terpotong kalau user sedang men-scroll web
+        },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
 
-            // cek apakah sudah di tahun terakhir dan bulan terakhir
-            if(i == selectedBulanAkhirIndex && y == selectedTahunAkhirIndex) break;
-
-            // cek apakah bulannyo lah lebih dari 12
-            if(i == 12) {
-                i = 1;
-                y+=1;
-            } else i++;
-        }
-    }
-
-    return jumlah;
+    // New Promise-based usage:
+    html2pdf().set(opt).from(containerLampiran).save();
 }
+
+fetch('../temp.html')
+    .then(response => response.text())
+    .then(data => {
+        containerLampiran.innerHTML = data;
+    });
+
+    
 
 // event ketika konfirmasi button diklik
 konfirmasiButton.addEventListener("click", () => {
@@ -124,8 +126,8 @@ konfirmasiButton.addEventListener("click", () => {
     bulanTahunAkhir = `${selectedTahunAkhirIndex}-${namaBulanAkhirDipilih}`;
 
     let rentangDipilihText = statusCheckboxBulanSaja ? `${bulanTahunAwal}` :`${bulanTahunAwal} s.d. ${bulanTahunAkhir}`;
-    const jumlahTahunRekon = selectedTahunAkhirIndex - selectedTahunAwalIndex;
-    let jumlahBulan = !statusCheckboxBulanSaja ? hitungJumlahBulanRekon(selectedBulanAwalIndex, selectedBulanAkhirIndex, selectedTahunAwalIndex, selectedTahunAkhirIndex, jumlahTahunRekon) : 1;
+
+    let [jumlah, jumlahBulan] = jumlahIuran(selectedBulanAwalIndex, selectedTahunAwalIndex, selectedBulanAkhirIndex, selectedTahunAkhirIndex, kelasDipilih, statusCheckboxBulanSaja, statusCheckboxBulanBerjalan); //variabel untuk menyimpan jumlah iuran yang harus dibayar
 
     // cek kalo bulan lah lebih dari 24 bulan
     if(jumlahBulan > 24) {
@@ -133,48 +135,20 @@ konfirmasiButton.addEventListener("click", () => {
         return;
     }
 
-    let jumlah = jumlahIuran(selectedBulanAwalIndex, selectedTahunAwalIndex, selectedBulanAkhirIndex, jumlahBulan, kelasDipilih); //variabel untuk menyimpan jumlah iuran yang harus dibayar
-
     // cek apakah ada bulan berjalan
     if(statusCheckboxBulanBerjalan) {
         jumlahBulan += 1;
         rentangDipilihText += ` dan ${currentYear}-${monthFormat(currentMonth)}`; // tambahin bulan berjalan ke rentan  g yang dipilih
-        jumlah += cekTarifBulan(`${currentYear}-${monthFormat(currentMonth)}`, kelasDipilih);
     } 
 
     rentangDipilihSpan.textContent = rentangDipilihText;
     iuranDipilihSpan.textContent = `Rp  ${jumlah.toLocaleString("id-ID")}`;
     bulanDipilihSpan.textContent = `${jumlahBulan} bulan`;
+
+    showLampiranContainer();
 });
 
-// fungsi menghitung jumlah bulan rekon
-const hitungJumlahBulanRekon = (bulanAwal, bulanAkhir, tahunAwal, tahunAkhir, jumlahTahunRekon) => {
-        let i = parseInt(bulanAwal);
-        let y = parseInt(tahunAwal);
-        let total = 0;
-
-        let z = 0; //z digunakan dalam perulangan tahun
-        let jumlahBulan = 0; //jumlahBulan digunakan untuk menghitung jumlah bulan yang dipilih
-
-        while(z <= jumlahTahunRekon) {
-            
-            jumlahBulan++;
-            // cek apakah sudah di tahun terakhir dan bulan terakhir
-            if(i == bulanAkhir && y == tahunAkhir) break;
-
-            // cek apakah bulannyo lah lebih dari 12
-            if(i == 12) {
-                i = 1;
-                z+=1;
-                y+=1;
-            } else {
-                i++;
-            }
-        }
-        return jumlahBulan;
-}
 
 
 
-// html2pdf(element);
 

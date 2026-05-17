@@ -66,3 +66,43 @@ export const tahun = [
     "2025",
     "2026",
 ];
+
+export const monthFormat = (bulan) => String(bulan).padStart(2, '0');
+
+export const cekTarifBulan = (bulanDicari, kelasDicari) => {
+    const dataDitemukan = data.find(
+        item => bulanDicari >= item.periode_mulai && bulanDicari <= item.periode_akhir
+    );
+    return dataDitemukan?.tarif[kelasDicari] ?? 0;
+}
+
+export const jumlahIuran = (bulanAwal, tahunAwal, bulanAkhir, tahunAkhir, kelas, statusCheckboxBulanSaja, statusCheckboxBulanBerjalan) => {
+    const tahunDefault = ["2021", "2022", "2023", "2024", "2025", "2026"];
+    let jumlahBulan = !statusCheckboxBulanSaja ? (tahunAkhir - tahunAwal) * 12 + (bulanAkhir - bulanAwal) + 1 : 1;
+    let jumlah = 0; //variabel untuk menyimpan jumlah iuran yang harus dibayar
+    let currentMonth = new Date().getMonth() + 1; 
+    let currentYear = 2026;
+
+    if(tahunDefault.includes(tahunAwal) && (statusCheckboxBulanSaja || tahunDefault.includes(tahunAkhir))){
+        jumlah += jumlahBulan * cekTarifBulan("2021-01", kelas);
+    } else {
+        let i = parseInt(bulanAwal);
+        let y = parseInt(tahunAwal);
+
+        for(let step = 0; step < jumlahBulan; step++) {
+            jumlah += cekTarifBulan(`${y}-${monthFormat(i.toString())}`, kelas);
+
+            // cek apakah bulannyo lah lebih dari 12
+            if(i == 12) {
+                i = 1;
+                y+=1;
+            } else i++;
+        }
+    }
+
+    if(statusCheckboxBulanBerjalan) {
+        jumlah += cekTarifBulan(`${currentYear}-${monthFormat(currentMonth)}`, kelas);
+    } 
+
+    return [jumlah, jumlahBulan];
+}

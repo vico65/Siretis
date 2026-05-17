@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch",
-    "test": "jest"
+    "test": "vitest"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.14",
@@ -11,6 +11,6 @@
     "tailwindcss": "^4.1.14"
   },
   "devDependencies": {
-    "jest": "^30.4.2"
-  } 
+    "vitest": "^4.1.6"
+  }
 }
